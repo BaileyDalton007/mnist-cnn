@@ -1,3 +1,13 @@
+# Tensorboard server start
+# tensorboard --logdir logs/cnn_1layer/
+
+from numpy.lib.histograms import histogram
+import keras
+from keras.models import Sequential
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from tensorflow.keras.optimizers import Adam
+from keras.callbacks import TensorBoard
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -31,6 +41,49 @@ xTrain, xValidate, yTrain, yValidate = train_test_split(
     xTrain, yTrain, test_size = 0.2, random_state = 12345
 )
 
-image = xTrain[0, :].reshape((28, 28))
-plt.imshow(image)
-plt.show()
+imgRows = 28
+imgCols = 28
+batch_size = 512
+imgShape = (imgRows, imgCols, 1)
+
+xTrain = xTrain.reshape(xTrain.shape[0], *imgShape)
+xTest = xTest.reshape(xTest.shape[0], *imgShape)
+xValidate = xValidate.reshape(xValidate.shape[0], *imgShape)
+
+# Pass in a list of layers to the model
+cnn_model = Sequential([
+    Conv2D(filters=32, kernel_size=(3, 3), activation='relu', input_shape=imgShape),
+    MaxPooling2D(pool_size=2), # shrinks input by a factor of two
+    Dropout(0.2), # Randomly drops out connections
+
+    Flatten(),
+    Dense(32, activation='relu'),
+    Dense(10, activation='softmax') # softmax used for output layer of clustering systems
+])
+
+tensorboard = TensorBoard(
+    log_dir=r'logs\{}'.format('cnn_1layer'),
+    write_graph = True,
+    write_grads=True,
+    histogram_freq = 1,
+    write_images = True
+)
+
+cnn_model.compile(
+    loss='sparse_categorical_crossentropy',
+    optimizer=Adam(learning_rate=0.001),
+    metrics = ['accuracy']
+)
+
+cnn_model.fit(
+    xTrain, yTrain, batch_size = batch_size,
+    epochs = 10, verbose = 1,
+    validation_data=(xValidate, yValidate),
+    callbacks = [tensorboard]
+)
+
+# Evaluate Model
+score = cnn_model.evaluate(xTest, yTest, verbose = 0)
+
+print('test loss: {:.4f}'.format(score[0]))
+print('test acc: {:.4f}'.format(score[1]))
