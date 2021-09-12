@@ -47,10 +47,10 @@ sprite_dim = int (np.sqrt(xTest.shape[0]))
 
 sprite_image = np.ones((cols * sprite_dim, rows * sprite_dim))
 
+index = 0
 labels = []
 for i in range(sprite_dim):
     for j in range(sprite_dim):
-        index = i * j
         
         labels.append(label[int(yTest[index])])
 
@@ -58,6 +58,8 @@ for i in range(sprite_dim):
             i * cols: (i + 1) * cols,
             j * rows: (j + 1) * rows
         ] = xTest[index].reshape(28, 28) * -1 + 1
+
+        index += 1
 
 # Metadata file column 1 is index and column 2 is label
 with open(embedding.metadata_path, 'w') as meta:
