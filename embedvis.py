@@ -30,7 +30,7 @@ embedding.sprite.image_path = os.path.join(logdir, 'sprite.png')
 embedding.sprite.single_image_dim.extend([28,28])
 
 # passed in logdir instead of summary_writer
-projector.visualize_embeddings(logdir, config)
+projector.visualize_embeddings(summary_writer, config)
 
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
@@ -43,7 +43,7 @@ cols = 28
 label = ['t_shirt', 'trouser', 'pullover', 'dress', 'coat',
         'sandal', 'shirt', 'sneaker', 'bag', 'ankle_boot']
 
-sprite_dim = int (np.sqrt(xTest.shape[0]))
+sprite_dim = int(np.sqrt(xTest.shape[0]))
 
 sprite_image = np.ones((cols * sprite_dim, rows * sprite_dim))
 
@@ -67,3 +67,6 @@ with open(embedding.metadata_path, 'w') as meta:
     for index, label in enumerate(labels):
         meta.write('{}\t{}\n'.format(index, label))
 
+plt.imsave(embedding.sprite.image_path, sprite_image, cmap='gray')
+plt.imshow(sprite_image, cmap='gray')
+plt.show()
