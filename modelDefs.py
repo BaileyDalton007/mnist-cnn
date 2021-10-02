@@ -50,3 +50,14 @@ cnn_3Layer = Sequential([
     Dropout(0.4, name='Dropout'),
     Dense(10, activation='softmax', name='Output')
 ], name=name)
+
+# Adds padding and doubles number of filters 32 => 64
+# From article written by Jason Brownlee (see Readme)
+name='brownlee'
+cnn_brownlee = Sequential([
+	Conv2D(64, (3, 3), padding='same', activation='relu', kernel_initializer='he_uniform', input_shape=imgShape),
+	MaxPooling2D((2, 2)),
+	Flatten(),
+	Dense(100, activation='relu', kernel_initializer='he_uniform'),
+	Dense(10, activation='softmax')
+], name = name)	

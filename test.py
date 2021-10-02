@@ -9,13 +9,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer
+from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee
 
-# Choose what model will be evaluated
-modelIndex = 0
+modelIndex = 0 # Choose what model will be evaluated
 
-modelList = ["1_Layer", "2_Layer", "3_Layer"]
-cnn_models = [cnn_1Layer, cnn_2Layer, cnn_3Layer]
+modelList = ["1_Layer", "2_Layer", "3_Layer", "brownlee"]
+cnn_models = [cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee]
 
 checkpointPath = r'logs\model_saves\{}\cp'.format(modelList[modelIndex])
 
@@ -71,5 +70,5 @@ def listPrediction(size):
             mislabeled.append(i)
     return mislabeled
 
-print(len(listPrediction(100)))
+print(len(listPrediction(1000)))
 
