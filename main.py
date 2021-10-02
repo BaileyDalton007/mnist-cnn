@@ -51,7 +51,8 @@ xTest = xTest.reshape(xTest.shape[0], *imgShape)
 xValidate = xValidate.reshape(xValidate.shape[0], *imgShape)
 
 # Pass in a list of layers to the model
-cnn_model = Sequential([
+name = '1_Layer'
+cnn_model_1 = Sequential([
     Conv2D(filters=32, kernel_size=(3, 3), activation='relu', input_shape=imgShape),
     MaxPooling2D(pool_size=2), # shrinks input by a factor of two
     Dropout(0.2), # Randomly drops out connections
@@ -59,7 +60,69 @@ cnn_model = Sequential([
     Flatten(),
     Dense(32, activation='relu'),
     Dense(10, activation='softmax') # softmax used for output layer of clustering systems
-])
+], name = name)
+
+name = '2_Layer'
+cnn_model_2 = Sequential([
+    Conv2D(32, kernel_size=3, activation='relu', input_shape=imgShape, name='Conv2D-1'),
+    MaxPooling2D(pool_size=2, name='MaxPool'),
+    Dropout(0.2, name='Dropout-1'),
+
+    Conv2D(64, kernel_size=3, activation='relu', name='Conv2D-2'),
+    Dropout(0.25, name='Dropout-2'),
+
+    Flatten(name='flatten'),
+
+    Dense(64, activation='relu', name='Dense'),
+    Dense(10, activation='softmax', name='Output')
+], name=name)
+
+name='3_layer'
+cnn_model_3 = Sequential([
+    Conv2D(32, kernel_size=3, activation='relu', 
+           input_shape=imgShape, kernel_initializer='he_normal', name='Conv2D-1'),
+    MaxPooling2D(pool_size=2, name='MaxPool'),
+    Dropout(0.25, name='Dropout-1'),
+
+    Conv2D(64, kernel_size=3, activation='relu', name='Conv2D-2'),
+    Dropout(0.25, name='Dropout-2'),
+
+    Conv2D(128, kernel_size=3, activation='relu', name='Conv2D-3'),
+    Dropout(0.4, name='Dropout-3'),
+
+    Flatten(name='flatten'),
+
+    Dense(128, activation='relu', name='Dense'),
+    Dropout(0.4, name='Dropout'),
+    Dense(10, activation='softmax', name='Output')
+], name=name)
+
+cnn_models = [cnn_model_1, cnn_model_2, cnn_model_3]
+
+history_dict = {}
+
+for model in cnn_models:
+    model.compile( 
+        loss='sparse_categorical_crossentropy',
+        optimizer=Adam(),
+        metrics = ['accuracy']
+    )
+
+    # Create a callback that saves the model's weights
+    checkpointPath = r'logs\model_saves\{}\cp'.format(model.name)
+    cpCallback = keras.callbacks.ModelCheckpoint(
+        filepath=checkpointPath,
+        save_weights_only=True,
+        verbose=1)
+
+    history = model.fit(
+        xTrain, yTrain, batch_size = batch_size,
+        epochs = 10, verbose = 1,
+        validation_data=(xValidate, yValidate),
+        callbacks=[cpCallback]
+    )
+
+    history_dict[model.name] = history
 
 tensorboard = TensorBoard(
     log_dir=r'logs\{}'.format('cnn_1layer'),
@@ -69,21 +132,20 @@ tensorboard = TensorBoard(
     write_images = True
 )
 
-cnn_model.compile(
-    loss='sparse_categorical_crossentropy',
-    optimizer=Adam(learning_rate=0.001),
-    metrics = ['accuracy']
-)
 
-cnn_model.fit(
-    xTrain, yTrain, batch_size = batch_size,
-    epochs = 10, verbose = 1,
-    validation_data=(xValidate, yValidate),
-    callbacks = [tensorboard]
-)
+# Plot the accuracy and loss
 
-# Evaluate Model
-score = cnn_model.evaluate(xTest, yTest, verbose = 0)
+# fig, (ax1, ax2) = plt.subplots(2, figsize=(8, 6))
 
-print('test loss: {:.4f}'.format(score[0]))
-print('test acc: {:.4f}'.format(score[1]))
+#for history in history_dict:
+#    val_acc = history_dict[history].history['val_acc']
+#    val_loss = history_dict[history].history['val_loss']
+#    ax1.plot(val_acc, label=history)
+#    ax2.plot(val_loss, label=history)
+    
+# ax1.set_ylabel('validation accuracy')
+# ax2.set_ylabel('validation loss')
+# ax2.set_xlabel('epochs')
+# ax1.legend()
+# ax2.legend()
+# plt.show()
