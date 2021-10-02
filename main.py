@@ -13,6 +13,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
+from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer
+
 # Downloaded data set from kaggle, which is already
 # pre-processed to csv form where each image is 1 row
 # populated with pixel values (28*28)
@@ -50,54 +52,8 @@ xTrain = xTrain.reshape(xTrain.shape[0], *imgShape)
 xTest = xTest.reshape(xTest.shape[0], *imgShape)
 xValidate = xValidate.reshape(xValidate.shape[0], *imgShape)
 
-# Pass in a list of layers to the model
-name = '1_Layer'
-cnn_model_1 = Sequential([
-    Conv2D(filters=32, kernel_size=(3, 3), activation='relu', input_shape=imgShape),
-    MaxPooling2D(pool_size=2), # shrinks input by a factor of two
-    Dropout(0.2), # Randomly drops out connections
-
-    Flatten(),
-    Dense(32, activation='relu'),
-    Dense(10, activation='softmax') # softmax used for output layer of clustering systems
-], name = name)
-
-name = '2_Layer'
-cnn_model_2 = Sequential([
-    Conv2D(32, kernel_size=3, activation='relu', input_shape=imgShape, name='Conv2D-1'),
-    MaxPooling2D(pool_size=2, name='MaxPool'),
-    Dropout(0.2, name='Dropout-1'),
-
-    Conv2D(64, kernel_size=3, activation='relu', name='Conv2D-2'),
-    Dropout(0.25, name='Dropout-2'),
-
-    Flatten(name='flatten'),
-
-    Dense(64, activation='relu', name='Dense'),
-    Dense(10, activation='softmax', name='Output')
-], name=name)
-
-name='3_layer'
-cnn_model_3 = Sequential([
-    Conv2D(32, kernel_size=3, activation='relu', 
-           input_shape=imgShape, kernel_initializer='he_normal', name='Conv2D-1'),
-    MaxPooling2D(pool_size=2, name='MaxPool'),
-    Dropout(0.25, name='Dropout-1'),
-
-    Conv2D(64, kernel_size=3, activation='relu', name='Conv2D-2'),
-    Dropout(0.25, name='Dropout-2'),
-
-    Conv2D(128, kernel_size=3, activation='relu', name='Conv2D-3'),
-    Dropout(0.4, name='Dropout-3'),
-
-    Flatten(name='flatten'),
-
-    Dense(128, activation='relu', name='Dense'),
-    Dropout(0.4, name='Dropout'),
-    Dense(10, activation='softmax', name='Output')
-], name=name)
-
-cnn_models = [cnn_model_1, cnn_model_2, cnn_model_3]
+# Define which model(s) should be trained
+cnn_models = [cnn_1Layer]
 
 history_dict = {}
 

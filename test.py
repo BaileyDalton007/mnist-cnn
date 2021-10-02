@@ -9,19 +9,18 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer
+
+# Choose what model will be evaluated
+modelIndex = 0
+
 modelList = ["1_Layer", "2_Layer", "3_Layer"]
-checkpointPath = r'logs\model_saves\{}\cp'.format(modelList[0])
+cnn_models = [cnn_1Layer, cnn_2Layer, cnn_3Layer]
+
+checkpointPath = r'logs\model_saves\{}\cp'.format(modelList[modelIndex])
 
 def create_model():
-  model = tf.keras.models.Sequential([
-    Conv2D(filters=32, kernel_size=(3, 3), activation='relu', input_shape=(28, 28, 1)),
-    MaxPooling2D(pool_size=2), # shrinks input by a factor of two
-    Dropout(0.2), # Randomly drops out connections
-
-    Flatten(),
-    Dense(32, activation='relu'),
-    Dense(10, activation='softmax') # softmax used for output layer of clustering systems
-  ])
+  model = cnn_models[modelIndex]
 
   model.compile(optimizer='adam',
                 loss=tf.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -45,16 +44,32 @@ xTest = test_data[:, 1:] / 255
 yTest = test_data[:, 0]
 xTest = xTest.reshape(xTest.shape[0], * (28, 28, 1))
 
-testIndex = 100
 
-# Gives image classification prediction
-img = xTest[testIndex]
-img = (np.expand_dims(img,0))
-predictions_single = model.predict(img)
-classPrediction = class_names[int(np.argmax(predictions_single[0]))]
-print(r'Prediction: {}'.format(classPrediction))
+def singlePrediction(testIndex):
+    # Gives image classification prediction
+    img = xTest[testIndex]
+    img = (np.expand_dims(img,0))
+    predictions_single = model.predict(img)
+    classPrediction = class_names[int(np.argmax(predictions_single[0]))]
+    print(r'Prediction: {}'.format(classPrediction))
 
-# Displays Image and ground truth
-plt.imshow(xTest[testIndex], cmap='gray')
-print(r'Ground Truth: {}'.format(class_names[int(yTest[testIndex])]))
-plt.show()
+    # Displays Image and ground truth
+    plt.imshow(xTest[testIndex], cmap='gray')
+    print(r'Ground Truth: {}'.format(class_names[int(yTest[testIndex])]))
+    plt.show()
+
+def listPrediction(size):
+    imgList = xTest[:size]
+    mislabeled = []
+    for i in range(len(imgList)):
+        img = imgList[i]
+        img = (np.expand_dims(img,0))
+        predictions_single = model.predict(img)
+        prediction = np.argmax(predictions_single[0])
+        truth = yTest[i]
+        if prediction != truth:
+            mislabeled.append(i)
+    return mislabeled
+
+print(len(listPrediction(100)))
+
