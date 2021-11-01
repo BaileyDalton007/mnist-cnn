@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout
+from keras.layers import Conv2D, MaxPooling2D, Dense, Flatten, Dropout, BatchNormalization
 
 imgShape = (28, 28, 1)
 
@@ -60,4 +60,79 @@ cnn_brownlee = Sequential([
 	Flatten(),
 	Dense(100, activation='relu', kernel_initializer='he_uniform'),
 	Dense(10, activation='softmax')
-], name = name)	
+], name = name)
+
+# Brownlee model with a single dropout layer of 0.25
+name='brownlee_D25'
+cnn_brownlee_D25 = Sequential([
+	Conv2D(64, (3, 3), padding='same', activation='relu', kernel_initializer='he_uniform', input_shape=imgShape),
+	MaxPooling2D((2, 2)),
+    Dropout(0.25, name='Dropout'),
+	Flatten(),
+	Dense(100, activation='relu', kernel_initializer='he_uniform'),
+	Dense(10, activation='softmax')
+], name = name)
+
+# Brownlee model with a single dropout layer of 0.50
+name='brownlee_D50'
+cnn_brownlee_D50 = Sequential([
+	Conv2D(64, (3, 3), padding='same', activation='relu', kernel_initializer='he_uniform', input_shape=imgShape),
+	MaxPooling2D((2, 2)),
+    Dropout(0.50, name='Dropout'),
+	Flatten(),
+	Dense(100, activation='relu', kernel_initializer='he_uniform'),
+	Dense(10, activation='softmax')
+], name = name)
+
+# Brownlee combined with 3 Layer model
+name='3_brownlee'
+cnn_3brownlee = Sequential([
+    Conv2D(32, (3, 3), padding='same', activation='relu', kernel_initializer='he_uniform', input_shape=imgShape),
+    MaxPooling2D(pool_size=2, name='MaxPool'),
+    Dropout(0.25, name='Dropout-1'),
+
+    Conv2D(64, (3, 3), padding='same', activation='relu', kernel_initializer='he_uniform', input_shape=imgShape),
+    Dropout(0.25, name='Dropout-2'),
+
+    Conv2D(128, kernel_size=3, activation='relu', name='Conv2D-3'),
+    Dropout(0.4, name='Dropout-3'),
+
+    Flatten(name='flatten'),
+
+    Dense(128, activation='relu', name='Dense'),
+    Dropout(0.4, name='Dropout'),
+    Dense(10, activation='softmax', name='Output')
+], name=name)
+
+
+name='4_layer'
+cnn_4Layer = Sequential([
+    Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=imgShape),
+    BatchNormalization(),
+
+    Conv2D(32, kernel_size=(3, 3), activation='relu'),
+    BatchNormalization(),
+    MaxPooling2D(pool_size=(2, 2)),
+    Dropout(0.25),
+
+    Conv2D(64, kernel_size=(3, 3), activation='relu'),
+    BatchNormalization(),
+    Dropout(0.25),
+
+    Conv2D(128, kernel_size=(3, 3), activation='relu'),
+    BatchNormalization(),
+    MaxPooling2D(pool_size=(2, 2)),
+    Dropout(0.25),
+
+    Flatten(),
+
+    Dense(512, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.5),
+
+    Dense(128, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.5),
+
+    Dense(10, activation='softmax')
+], name=name)
