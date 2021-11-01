@@ -13,7 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee
+from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee, cnn_brownlee_D25, cnn_brownlee_D50, cnn_3brownlee, cnn_4Layer
 
 # Downloaded data set from kaggle, which is already
 # pre-processed to csv form where each image is 1 row
@@ -53,7 +53,7 @@ xTest = xTest.reshape(xTest.shape[0], *imgShape)
 xValidate = xValidate.reshape(xValidate.shape[0], *imgShape)
 
 # Define which model(s) should be trained
-cnn_models = [cnn_brownlee]
+cnn_models = [cnn_4Layer]
 
 history_dict = {}
 
@@ -73,7 +73,7 @@ for model in cnn_models:
 
     history = model.fit(
         xTrain, yTrain, batch_size = batch_size,
-        epochs = 10, verbose = 1,
+        epochs = 50, verbose = 1,
         validation_data=(xValidate, yValidate),
         callbacks=[cpCallback]
     )

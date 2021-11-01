@@ -9,12 +9,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee
+from modelDefs import cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee, cnn_brownlee_D25, cnn_brownlee_D50, cnn_3brownlee, cnn_4Layer
 
-modelIndex = 0 # Choose what model will be evaluated
+modelIndex = 7 # Choose what model will be evaluated
 
-modelList = ["1_Layer", "2_Layer", "3_Layer", "brownlee"]
-cnn_models = [cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee]
+modelList = ["1_Layer", "2_Layer", "3_Layer", "brownlee", "brownlee_D25", "brownlee_D50", "3_brownlee", "4_Layer"]
+cnn_models = [cnn_1Layer, cnn_2Layer, cnn_3Layer, cnn_brownlee, cnn_brownlee_D25, cnn_brownlee_D50, cnn_3brownlee, cnn_4Layer]
 
 checkpointPath = r'logs\model_saves\{}\cp'.format(modelList[modelIndex])
 
